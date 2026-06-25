@@ -22,7 +22,9 @@ RUN apt-get update && apt-get install -y \
         bcmath \
         gd \
         zip \
-        intl
+        intl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -34,7 +36,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-RUN a2dismod mpm_event mpm_worker || true \
+# Force Apache to use only one MPM module
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork rewrite
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -44,4 +48,4 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 EXPOSE 80
 
-CMD php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground
+CMD php artisan config:cache && php artisan view:cache && apache2-foreground
