@@ -19,18 +19,72 @@
 
             <div class="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px]">
             <main class="space-y-10">
+                @if ($selectedInstrument)
+                    <section class="vvmi-card-flat p-5 sm:p-7">
+                        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                            <div>
+                                <p class="vvmi-eyebrow">Selected instrument</p>
+                                <h3 class="mt-2 text-3xl vvmi-heading">{{ $selectedInstrument->title }}</h3>
+                                <p class="mt-3 vvmi-body">Your learning path is linked to this instrument.</p>
+                            </div>
+
+                            @if ($currentCourse)
+                                <a href="{{ route('courses.show', $currentCourse) }}" class="vvmi-button-primary self-start lg:self-auto">
+                                    Open current course
+                                </a>
+                            @elseif ($activeSubscription)
+                                <span class="rounded-full bg-[#513CC7]/10 px-5 py-3 text-sm font-black text-[#513CC7]">All available courses completed</span>
+                            @endif
+                        </div>
+
+                        @if ($dashboardCourses->isNotEmpty())
+                            <div class="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                @foreach ($dashboardCourses as $course)
+                                    @php
+                                        $access = $course->studentAccesses->first();
+                                        $status = $access?->status ?? 'locked';
+                                        $progressValues = $course->lessons->flatMap->progress->where('user_id', auth()->id())->pluck('watched_percentage');
+                                        $courseProgress = $progressValues->isNotEmpty() ? (int) round($progressValues->average()) : 0;
+                                    @endphp
+
+                                    @if (in_array($status, ['unlocked', 'completed'], true))
+                                        <a href="{{ route('courses.show', $course) }}" class="group block rounded-[1.5rem] border border-[#513CC7]/10 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <h4 class="text-xl vvmi-heading transition group-hover:text-[#513CC7]">{{ $course->title }}</h4>
+                                                <span class="rounded-full bg-[#513CC7]/10 px-3 py-1 text-xs font-black text-[#513CC7]">{{ str($status)->headline() }}</span>
+                                            </div>
+                                            <p class="mt-2 text-sm font-bold text-[#1C1F2F]/65">{{ $course->lessons_count }} lessons</p>
+                                            <x-progress-bar class="mt-5" :value="$courseProgress" label="Course progress" />
+                                        </a>
+                                    @else
+                                        <div class="rounded-[1.5rem] border border-[#513CC7]/10 bg-white/70 p-5 opacity-75">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <h4 class="text-xl vvmi-heading">{{ $course->title }}</h4>
+                                                <span class="rounded-full bg-[#1C1F2F]/10 px-3 py-1 text-xs font-black text-[#1C1F2F]/65">Locked</span>
+                                            </div>
+                                            <p class="mt-2 text-sm font-bold text-[#1C1F2F]/65">{{ $course->lessons_count }} lessons</p>
+                                            <p class="mt-4 text-sm font-semibold text-[#1C1F2F]/60">Complete the previous course to unlock.</p>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
                 <section class="vvmi-card-flat p-5 sm:p-7">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p class="vvmi-eyebrow">Recently watched</p>
                             <h3 class="mt-2 text-3xl vvmi-heading sm:text-4xl">Pick up where you stopped</h3>
-                            <p class="mt-3 vvmi-body">Your latest lessons are here so you can jump back in fast.</p>
+                            <!-- <p class="mt-3 vvmi-body">Your latest lessons are here so you can jump back in fast.</p> -->
                         </div>
                         <a href="{{ route('academy.continue') }}" class="vvmi-button-ghost self-start sm:self-auto">View all</a>
                     </div>
 
                     <div class="mt-7 grid gap-5 md:grid-cols-2">
                         @forelse ($recentProgress as $progress)
+                            @continue(! $progress->lesson?->course?->instrument)
                             <a href="{{ route('lessons.show', $progress->lesson) }}" class="group block cursor-pointer rounded-[1.75rem] border border-[#513CC7]/10 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]">
                                 <div class="mb-5 overflow-hidden rounded-[1.5rem] bg-[#513CC7]/10">
                                     <div class="grid aspect-[16/9] place-items-center text-5xl text-[#513CC7] transition duration-300 group-hover:scale-105 group-focus-visible:scale-105">
@@ -53,9 +107,9 @@
                                 class="md:col-span-2"
                                 icon="🎵"
                                 title="No lessons watched yet"
-                                message="Start a course and your progress will appear here."
-                                :action-url="route('academy.index')"
-                                action-label="Browse instruments"
+                                message=" "
+                                :action-url="$currentCourse ? route('courses.show', $currentCourse) : route('academy.index')"
+                                :action-label="$selectedInstrument ? 'Open current course' : 'Choose instrument'"
                             />
                         @endforelse
                     </div>
@@ -70,6 +124,7 @@
 
                     <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                         @forelse ($recommendedLessons as $lesson)
+                            @continue(! $lesson->course?->instrument)
                             <a href="{{ route('lessons.show', $lesson) }}" class="group block cursor-pointer overflow-hidden rounded-[2rem] border border-[#513CC7]/10 bg-white p-4 shadow-[0_18px_60px_rgba(28,31,47,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(28,31,47,0.12)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]">
                                 <div class="overflow-hidden rounded-[1.5rem] bg-[#513CC7]/10">
                                     <div class="grid aspect-[4/3] place-items-center text-5xl text-[#513CC7] transition duration-300 group-hover:scale-105 group-focus-visible:scale-105">🎬</div>
@@ -107,7 +162,9 @@
                     @else
                         <p class="mt-2 text-lg font-black text-[#1C1F2F]">Free access</p>
                         <p class="mt-1 text-sm font-semibold text-[#1C1F2F]/65">Subscribe to unlock premium lessons.</p>
-                        <a href="{{ route('academy.index') }}" class="mt-3 inline-flex text-sm font-black text-[#513CC7] hover:underline">Browse instruments</a>
+                        @unless ($selectedInstrument)
+                            <a href="{{ route('academy.index') }}" class="mt-3 inline-flex text-sm font-black text-[#513CC7] hover:underline">Choose instrument</a>
+                        @endunless
                     @endif
                 </section>
 

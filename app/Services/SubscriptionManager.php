@@ -60,6 +60,7 @@ class SubscriptionManager
                 [
                     'user_id' => $transaction->user_id,
                     'subscription_plan_id' => $plan->id,
+                    'instrument_id' => $transaction->selected_instrument_id,
                     'paystack_customer_code' => $customerCode,
                     'paystack_subscription_code' => $subscriptionCode,
                     'paystack_email_token' => $emailToken,

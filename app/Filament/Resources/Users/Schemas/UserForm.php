@@ -18,6 +18,12 @@ class UserForm
                     'admin' => 'Admin',
                     'student' => 'Student',
                 ])->required(),
+                Select::make('selected_instrument_id')
+                    ->label('Selected Instrument')
+                    ->relationship('selectedInstrument', 'title')
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Admins can change this if a student selected the wrong instrument. Students cannot change it themselves.'),
             ]);
     }
 }

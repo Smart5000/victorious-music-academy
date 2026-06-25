@@ -61,6 +61,11 @@ class Course extends Model
         return $this->morphMany(Thumbnail::class, 'thumbnailable');
     }
 
+    public function studentAccesses(): HasMany
+    {
+        return $this->hasMany(StudentCourseAccess::class);
+    }
+
     public function scopeOrdered($query)
     {
         return $query->orderBy('order');

@@ -26,6 +26,7 @@ class UserSubscription extends Model
     protected $fillable = [
         'user_id',
         'subscription_plan_id',
+        'instrument_id',
         'paystack_customer_code',
         'paystack_subscription_code',
         'paystack_email_token',
@@ -49,6 +50,11 @@ class UserSubscription extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+    }
+
+    public function instrument(): BelongsTo
+    {
+        return $this->belongsTo(Instrument::class);
     }
 
     public function isActive(): bool

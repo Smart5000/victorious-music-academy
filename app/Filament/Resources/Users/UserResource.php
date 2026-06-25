@@ -39,7 +39,7 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->students();
+        return parent::getEloquentQuery()->students()->with('selectedInstrument');
     }
 
     public static function getRelations(): array

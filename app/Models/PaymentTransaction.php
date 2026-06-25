@@ -20,6 +20,7 @@ class PaymentTransaction extends Model
     protected $fillable = [
         'user_id',
         'subscription_plan_id',
+        'selected_instrument_id',
         'reference',
         'amount',
         'currency',
@@ -43,5 +44,10 @@ class PaymentTransaction extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+    }
+
+    public function selectedInstrument(): BelongsTo
+    {
+        return $this->belongsTo(Instrument::class, 'selected_instrument_id');
     }
 }

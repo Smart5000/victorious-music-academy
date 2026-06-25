@@ -39,7 +39,7 @@ class HomeController extends Controller
                 'name' => SiteSetting::value('site.name', 'Victorious Victory Music Institute'),
                 'heroTitle' => SiteSetting::value('home.hero_title', 'Music lessons that help children shine'),
                 'heroSubtitle' => SiteSetting::value('home.hero_subtitle', 'Learn music through fun video lessons.'),
-                'ctaText' => SiteSetting::value('home.cta_text', 'Start Learning for Free'),
+                'ctaText' => SiteSetting::value('home.cta_text', 'Start Learning'),
                 'about' => SiteSetting::value('home.about_text', 'A friendly online academy for young musicians.'),
             ],
         ]);

@@ -17,7 +17,7 @@ class HomepageIntroVideoForm
                     ->disk('public')
                     ->directory('homepage/intro-videos')
                     ->visibility('public')
-                    ->acceptedFileTypes(['video/mp4', 'video/webm', 'video/quicktime'])
+                    ->acceptedFileTypes(['video/mp4', 'video/webm'])
                     ->helperText('MP4 is recommended. Maximum file size: 100 MB.')
                     ->maxSize(102400)
                     ->fetchFileInformation(false)

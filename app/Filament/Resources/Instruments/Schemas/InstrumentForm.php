@@ -17,7 +17,16 @@ class InstrumentForm
                 TextInput::make('title')->required()->maxLength(255),
                 TextInput::make('slug')->required()->unique(ignoreRecord: true)->maxLength(255),
                 Textarea::make('description')->columnSpanFull(),
-                FileUpload::make('thumbnail')->image()->directory('instruments'),
+                FileUpload::make('thumbnail')
+                    ->image()
+                    ->disk('public')
+                    ->directory('instruments')
+                    ->visibility('public')
+                    ->acceptedFileTypes(['image/jpg', 'image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(5120)
+                    ->fetchFileInformation(false)
+                    ->deletable()
+                    ->openable(),
                 Toggle::make('is_active')
                     ->label('Show on student website')
                     ->helperText('Turn this off to hide the instrument from students without deleting it.')

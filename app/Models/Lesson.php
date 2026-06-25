@@ -132,6 +132,6 @@ class Lesson extends Model
 
     public function requiresSubscription(): bool
     {
-        return ! $this->is_free_preview && ($this->is_premium || $this->course?->is_premium);
+        return true;
     }
 }

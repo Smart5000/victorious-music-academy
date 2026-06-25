@@ -62,10 +62,7 @@ class ProductForm
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         'application/zip',
-                        'audio/mpeg',
-                        'audio/wav',
-                        'audio/ogg',
-                        'audio/mp4',
+                        'application/x-zip-compressed',
                     ])
                     ->maxSize(20480)
                     ->visible(fn (Get $get): bool => $get('product_type') === Product::PRODUCT_TYPE_MATERIALS),

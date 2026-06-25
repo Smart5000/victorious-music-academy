@@ -10,12 +10,17 @@
             </p>
 
             @auth
-                <form method="POST" action="{{ route('subscriptions.subscribe', $plan) }}" class="mt-7">
-                    @csrf
-                    <button class="vvmi-button-primary w-full" @disabled($activeSubscription)>
-                        {{ $activeSubscription ? 'Currently subscribed' : 'Subscribe' }}
-                    </button>
-                </form>
+                @if ($activeSubscription)
+                    <button class="vvmi-button-primary mt-7 w-full" disabled>Currently subscribed</button>
+                @elseif (isset($selectedInstrument))
+                    <form method="POST" action="{{ route('subscriptions.subscribe', $plan) }}" class="mt-7">
+                        @csrf
+                        <input type="hidden" name="selected_instrument_id" value="{{ $selectedInstrument->id }}">
+                        <button class="vvmi-button-primary w-full">Subscribe</button>
+                    </form>
+                @else
+                    <a href="{{ route('academy.index') }}" class="vvmi-button-primary mt-7 w-full">Choose instrument first</a>
+                @endif
             @else
                 <a href="{{ route('login') }}" class="vvmi-button-primary mt-7 w-full">Login to subscribe</a>
             @endauth

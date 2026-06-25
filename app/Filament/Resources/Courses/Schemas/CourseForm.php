@@ -20,7 +20,16 @@ class CourseForm
                 TextInput::make('title')->required()->maxLength(255),
                 TextInput::make('slug')->required()->unique(ignoreRecord: true)->maxLength(255),
                 Textarea::make('description')->columnSpanFull(),
-                FileUpload::make('thumbnail')->image()->directory('courses'),
+                FileUpload::make('thumbnail')
+                    ->image()
+                    ->disk('public')
+                    ->directory('courses')
+                    ->visibility('public')
+                    ->acceptedFileTypes(['image/jpg', 'image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(5120)
+                    ->fetchFileInformation(false)
+                    ->deletable()
+                    ->openable(),
                 TextInput::make('order')->numeric()->default(0)->required(),
                 Toggle::make('is_premium')
                     ->label('Premium Course')

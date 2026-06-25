@@ -31,7 +31,7 @@
                         <p class="text-5xl">🎒</p>
                         <h3 class="mt-4 text-2xl font-black text-[#1C1F2F]">Your learning backpack is empty</h3>
                         <p class="mt-2 text-[#1C1F2F]/70">Start watching a lesson and it will appear here automatically.</p>
-                        <a href="{{ route('academy.index') }}" class="mt-6 inline-flex rounded-full bg-[#513CC7] px-6 py-3 font-black text-white">Browse instruments</a>
+                        <a href="{{ route('academy.index') }}" class="mt-6 inline-flex rounded-full bg-[#513CC7] px-6 py-3 font-black text-white">Choose instruments</a>
                     </div>
                 @endforelse
             </div>

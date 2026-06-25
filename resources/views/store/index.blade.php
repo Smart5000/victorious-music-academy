@@ -33,7 +33,7 @@
                             class="sm:col-span-2 lg:col-span-4"
                             icon="🎁"
                             title="Free products are coming soon"
-                            message="The admin can add free PDFs and practice materials from the CMS."
+                            message=" "
                         />
                     @endforelse
                 </div>
@@ -55,7 +55,7 @@
                             class="sm:col-span-2 lg:col-span-4"
                             icon="✨"
                             title="New releases are coming soon"
-                            message="Mark products as New Release in the CMS to show them here."
+                            message=" "
                         />
                     @endforelse
                 </div>

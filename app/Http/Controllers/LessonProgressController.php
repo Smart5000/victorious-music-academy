@@ -6,11 +6,12 @@ use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\VideoWatchHistory;
 use App\Http\Requests\StoreLessonProgressRequest;
+use App\Services\StudentCourseAccessManager;
 use Illuminate\Http\JsonResponse;
 
 class LessonProgressController extends Controller
 {
-    public function store(StoreLessonProgressRequest $request, Lesson $lesson): JsonResponse
+    public function store(StoreLessonProgressRequest $request, Lesson $lesson, StudentCourseAccessManager $courseAccess): JsonResponse
     {
         $data = $request->validated();
 
@@ -37,6 +38,10 @@ class LessonProgressController extends Controller
             'percentage' => $newPercent,
             'watched_second' => (int) ($data['last_watched_second'] ?? 0),
         ]);
+
+        if ($progress->completed) {
+            $courseAccess->completeCourseIfReady($request->user(), $lesson->course()->firstOrFail());
+        }
 
         return response()->json([
             'watched_percentage' => $progress->watched_percentage,

@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-Victorious Victory Music Institute is a professional children’s music learning academy for ages 4–17. Students register for free, browse instruments, watch structured lessons, continue from their last video position, and see their learning progress. Admins manage the full curriculum and website content through FilamentPHP.
+Victorious Victory Music Institute is a professional children’s music learning academy for ages 4–17. Students register for free, Choose instruments, watch structured lessons, continue from their last video position, and see their learning progress. Admins manage the full curriculum and website content through FilamentPHP.
 
 ## Recommended Stack
 

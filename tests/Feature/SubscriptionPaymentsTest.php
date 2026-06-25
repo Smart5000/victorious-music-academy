@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\PaymentTransaction;
+use App\Models\StudentCourseAccess;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -39,6 +40,7 @@ class SubscriptionPaymentsTest extends TestCase
     {
         $user = User::factory()->create();
         $plan = $this->createPlan();
+        $course = Course::factory()->create();
 
         Http::fake([
             'https://api.paystack.co/transaction/initialize' => Http::response([
@@ -51,12 +53,13 @@ class SubscriptionPaymentsTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->post(route('subscriptions.subscribe', $plan))
+            ->post(route('subscriptions.subscribe', $plan), ['selected_instrument_id' => $course->instrument_id])
             ->assertRedirect('https://checkout.paystack.com/test-reference');
 
         $this->assertDatabaseHas('payment_transactions', [
             'user_id' => $user->id,
             'subscription_plan_id' => $plan->id,
+            'selected_instrument_id' => $course->instrument_id,
             'amount' => 500000,
             'status' => PaymentTransaction::STATUS_PENDING,
         ]);
@@ -66,9 +69,11 @@ class SubscriptionPaymentsTest extends TestCase
     {
         $user = User::factory()->create();
         $plan = $this->createPlan();
+        $course = Course::factory()->create();
         $transaction = PaymentTransaction::query()->create([
             'user_id' => $user->id,
             'subscription_plan_id' => $plan->id,
+            'selected_instrument_id' => $course->instrument_id,
             'reference' => 'VMA-CALLBACK-TEST',
             'amount' => 500000,
             'currency' => 'NGN',
@@ -94,7 +99,13 @@ class SubscriptionPaymentsTest extends TestCase
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $user->id,
             'subscription_plan_id' => $plan->id,
+            'instrument_id' => $course->instrument_id,
             'status' => UserSubscription::STATUS_ACTIVE,
+        ]);
+        $this->assertDatabaseHas('student_course_access', [
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+            'status' => StudentCourseAccess::STATUS_UNLOCKED,
         ]);
     }
 
@@ -141,6 +152,28 @@ class SubscriptionPaymentsTest extends TestCase
             ->assertSessionHas('status', 'Subscribe to continue learning this course.');
     }
 
+    public function test_course_details_require_an_active_subscription(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::factory()->create(['is_premium' => false]);
+
+        $this->actingAs($user)
+            ->get(route('courses.show', $course))
+            ->assertRedirect(route('academy.instrument', $course->instrument))
+            ->assertSessionHas('status', 'Subscribe to continue learning this course.');
+    }
+
+    public function test_non_preview_lessons_require_an_active_subscription(): void
+    {
+        $user = User::factory()->create();
+        $lesson = Lesson::factory()->create(['is_premium' => false, 'is_free_preview' => false]);
+
+        $this->actingAs($user)
+            ->get(route('lessons.show', $lesson))
+            ->assertRedirect(route('academy.instrument', $lesson->course->instrument))
+            ->assertSessionHas('status', 'Subscribe to continue learning this course.');
+    }
+
     public function test_instrument_course_page_displays_courses_and_subscription_plans(): void
     {
         $user = User::factory()->create();
@@ -151,7 +184,8 @@ class SubscriptionPaymentsTest extends TestCase
             ->get(route('academy.instrument', $course->instrument))
             ->assertOk()
             ->assertSee($course->title)
-            ->assertSee($plan->name);
+            ->assertSee($plan->name)
+            ->assertDontSee(route('courses.show', $course), false);
     }
 
     public function test_authenticated_navbar_does_not_show_pricing_link(): void
@@ -166,21 +200,31 @@ class SubscriptionPaymentsTest extends TestCase
     {
         $user = User::factory()->create();
         $plan = $this->createPlan();
+        $lesson = Lesson::factory()->create(['is_premium' => true, 'is_free_preview' => false]);
+
         UserSubscription::query()->create([
             'user_id' => $user->id,
             'subscription_plan_id' => $plan->id,
+            'instrument_id' => $lesson->course->instrument_id,
             'status' => UserSubscription::STATUS_ACTIVE,
             'starts_at' => now(),
             'ends_at' => now()->addMonth(),
         ]);
-        $lesson = Lesson::factory()->create(['is_premium' => true, 'is_free_preview' => false]);
+        $user->forceFill(['selected_instrument_id' => $lesson->course->instrument_id])->save();
+        StudentCourseAccess::query()->create([
+            'user_id' => $user->id,
+            'course_id' => $lesson->course_id,
+            'status' => StudentCourseAccess::STATUS_UNLOCKED,
+            'unlocked_by' => StudentCourseAccess::UNLOCKED_BY_SYSTEM,
+            'unlocked_at' => now(),
+        ]);
 
         $this->actingAs($user)
             ->get(route('lessons.show', $lesson))
             ->assertOk();
     }
 
-    public function test_free_preview_remains_available_inside_a_premium_course(): void
+    public function test_free_preview_still_requires_an_unlocked_subscribed_course(): void
     {
         $user = User::factory()->create();
         $course = Course::factory()->create(['is_premium' => true]);
@@ -192,7 +236,8 @@ class SubscriptionPaymentsTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('lessons.show', $lesson))
-            ->assertOk();
+            ->assertRedirect(route('academy.instrument', $course->instrument))
+            ->assertSessionHas('status', 'Subscribe to continue learning this course.');
     }
 
     private function createPlan(): SubscriptionPlan
