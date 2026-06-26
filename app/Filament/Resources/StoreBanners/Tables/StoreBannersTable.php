@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StoreBanners\Tables;
 
+use App\Support\Media;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,7 +19,9 @@ class StoreBannersTable
         return $table
             ->defaultSort('updated_at', 'desc')
             ->columns([
-                ImageColumn::make('image')->label('Banner')->disk('public'),
+                ImageColumn::make('banner_url')
+                    ->label('Banner')
+                    ->getStateUsing(fn ($record): ?string => Media::url($record->banner_url, $record->image)),
                 IconColumn::make('is_active')->label('Active')->boolean(),
                 TextColumn::make('updated_at')->label('Last Updated')->dateTime()->sortable(),
             ])

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Product;
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -28,7 +29,7 @@ class ProductForm
                     ->live()
                     ->required(),
                 Textarea::make('description')->required()->columnSpanFull(),
-                FileUpload::make('thumbnail')
+                FilamentCloudinaryUpload::image(FileUpload::make('thumbnail')
                     ->image()
                     ->disk('public')
                     ->directory('products/thumbnails')
@@ -37,7 +38,7 @@ class ProductForm
                     ->maxSize(2048)
                     ->fetchFileInformation(false)
                     ->deletable()
-                    ->openable(),
+                    ->openable(), 'victorious-music-academy/products/thumbnails'),
                 Select::make('price_type')
                     ->options([
                         Product::PRICE_TYPE_FREE => 'Free',
@@ -52,7 +53,7 @@ class ProductForm
                     ->default(0)
                     ->visible(fn (Get $get): bool => $get('price_type') === Product::PRICE_TYPE_PAID)
                     ->required(),
-                FileUpload::make('material_file')
+                FilamentCloudinaryUpload::file(FileUpload::make('material_file')
                     ->label('Material File')
                     ->disk('public')
                     ->directory('products/materials')
@@ -65,7 +66,7 @@ class ProductForm
                         'application/x-zip-compressed',
                     ])
                     ->maxSize(20480)
-                    ->visible(fn (Get $get): bool => $get('product_type') === Product::PRODUCT_TYPE_MATERIALS),
+                    ->visible(fn (Get $get): bool => $get('product_type') === Product::PRODUCT_TYPE_MATERIALS), 'victorious-music-academy/products/materials'),
                 Toggle::make('is_new_release')->label('New Release')->default(false),
                 Toggle::make('is_active')->label('Published')->default(true),
             ]);

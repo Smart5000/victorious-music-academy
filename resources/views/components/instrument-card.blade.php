@@ -11,6 +11,7 @@
 
     $cardClasses = 'group block h-full overflow-hidden rounded-[2rem] border border-[#513CC7]/10 bg-white p-4 shadow-[0_18px_60px_rgba(28,31,47,0.08)] transition duration-300';
     $interactiveClasses = 'cursor-pointer hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(28,31,47,0.12)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]';
+    $thumbnailUrl = \App\Support\Media::url($instrument->thumbnail_url, $instrument->thumbnail);
 @endphp
 
 @if ($instrument->coming_soon)
@@ -19,9 +20,9 @@
     <a href="{{ route('academy.instrument', $instrument) }}" {{ $attributes->class($cardClasses.' '.$interactiveClasses) }}>
 @endif
     <div class="overflow-hidden rounded-[1.5rem] bg-[#513CC7]/10">
-        @if ($instrument->thumbnail)
+        @if ($thumbnailUrl)
             <img
-                src="{{ asset('storage/'.$instrument->thumbnail) }}"
+                src="{{ $thumbnailUrl }}"
                 alt="{{ $instrument->title }}"
                 class="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105 group-focus-visible:scale-105"
                 loading="lazy"

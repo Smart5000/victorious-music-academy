@@ -4,6 +4,7 @@
     $lessons = $course->lessons ?? collect();
     $progressValues = $lessons->flatMap->progress->where('user_id', auth()->id())->pluck('watched_percentage');
     $averageProgress = $progressValues->isNotEmpty() ? (int) round($progressValues->average()) : 0;
+    $thumbnailUrl = \App\Support\Media::url($course->thumbnail_url, $course->thumbnail);
 @endphp
 
 <a
@@ -11,9 +12,9 @@
     {{ $attributes->class('group block h-full cursor-pointer overflow-hidden rounded-[2rem] border border-[#513CC7]/10 bg-white p-4 shadow-[0_18px_60px_rgba(28,31,47,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(28,31,47,0.12)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]') }}
 >
     <div class="overflow-hidden rounded-[1.5rem] bg-[#513CC7]/10">
-        @if ($course->thumbnail)
+        @if ($thumbnailUrl)
             <img
-                src="{{ asset('storage/'.$course->thumbnail) }}"
+                src="{{ $thumbnailUrl }}"
                 alt="{{ $course->title }}"
                 class="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105 group-focus-visible:scale-105"
                 loading="lazy"

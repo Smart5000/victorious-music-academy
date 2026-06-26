@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Instruments\Schemas;
 
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,7 +18,7 @@ class InstrumentForm
                 TextInput::make('title')->required()->maxLength(255),
                 TextInput::make('slug')->required()->unique(ignoreRecord: true)->maxLength(255),
                 Textarea::make('description')->columnSpanFull(),
-                FileUpload::make('thumbnail')
+                FilamentCloudinaryUpload::image(FileUpload::make('thumbnail')
                     ->image()
                     ->disk('public')
                     ->directory('instruments')
@@ -26,7 +27,7 @@ class InstrumentForm
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
                     ->deletable()
-                    ->openable(),
+                    ->openable(), 'victorious-music-academy/instruments'),
                 Toggle::make('is_active')
                     ->label('Show on student website')
                     ->helperText('Turn this off to hide the instrument from students without deleting it.')

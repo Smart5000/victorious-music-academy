@@ -12,7 +12,7 @@
             @if ($storeBanner)
                 <section class="overflow-hidden rounded-[2rem] shadow-[0_18px_60px_rgba(28,31,47,0.08)]">
                     <img
-                        src="{{ asset('storage/'.$storeBanner->image) }}"
+                        src="{{ \App\Support\Media::url($storeBanner->banner_url, $storeBanner->image) }}"
                         alt="Store promotion"
                         class="h-44 w-full object-cover sm:h-64 lg:h-80"
                     >

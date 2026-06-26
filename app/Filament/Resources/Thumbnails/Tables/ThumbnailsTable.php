@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Thumbnails\Tables;
 
+use App\Support\Media;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -16,7 +17,9 @@ class ThumbnailsTable
     {
         return $table
             ->columns([
-                ImageColumn::make('path'),
+                ImageColumn::make('thumbnail_url')
+                    ->label('Image')
+                    ->getStateUsing(fn ($record): ?string => Media::url($record->thumbnail_url, $record->path)),
                 TextColumn::make('title')->searchable()->sortable(),
                 TextColumn::make('thumbnailable_type')->label('Type')->formatStateUsing(fn (?string $state): string => class_basename($state ?? '')),
                 IconColumn::make('is_primary')->boolean(),

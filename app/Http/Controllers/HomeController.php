@@ -6,8 +6,8 @@ use App\Models\HomepageIntroVideo;
 use App\Models\Instrument;
 use App\Models\Lesson;
 use App\Models\SiteSetting;
+use App\Support\Media;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -16,11 +16,11 @@ class HomeController extends Controller
         $instruments = Instrument::query()->active()->withCount('courses')->orderBy('title')->get();
         $introVideo = HomepageIntroVideo::query()->active()->latest('updated_at')->first();
 
-        if ($introVideo && ! Storage::disk('public')->exists($introVideo->video)) {
+        if ($introVideo && ! Media::exists($introVideo->video_url, $introVideo->video)) {
             $introVideo = null;
         }
 
-        if ($introVideo?->poster && ! Storage::disk('public')->exists($introVideo->poster)) {
+        if ($introVideo?->poster && ! Media::exists($introVideo->poster_url, $introVideo->poster)) {
             $introVideo->poster = null;
         }
 

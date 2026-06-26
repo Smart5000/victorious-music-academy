@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\StoreBanner;
+use App\Support\Media;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage;
 
 class StoreController extends Controller
 {
@@ -17,7 +17,7 @@ class StoreController extends Controller
             ->latest('updated_at')
             ->first();
 
-        if ($storeBanner && ! Storage::disk('public')->exists($storeBanner->image)) {
+        if ($storeBanner && ! Media::exists($storeBanner->banner_url, $storeBanner->image)) {
             $storeBanner = null;
         }
 

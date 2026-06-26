@@ -66,9 +66,9 @@
                                 preload="metadata"
                                 playsinline
                                 @play="started = true"
-                                @if ($introVideo->poster) poster="{{ asset('storage/'.$introVideo->poster) }}" @endif
+                                @if (\App\Support\Media::url($introVideo->poster_url, $introVideo->poster)) poster="{{ \App\Support\Media::url($introVideo->poster_url, $introVideo->poster) }}" @endif
                             >
-                                <source src="{{ asset('storage/'.$introVideo->video) }}">
+                                <source src="{{ \App\Support\Media::url($introVideo->video_url, $introVideo->video) }}">
                                 Your browser does not support the video element.
                             </video>
 

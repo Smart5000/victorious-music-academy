@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CloudinaryModelMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,8 @@ class Thumbnail extends Model
         'thumbnailable_type',
         'title',
         'path',
+        'thumbnail_url',
+        'thumbnail_public_id',
         'alt_text',
         'is_primary',
     ];
@@ -23,6 +26,11 @@ class Thumbnail extends Model
     protected $casts = [
         'is_primary' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(fn (self $thumbnail) => CloudinaryModelMedia::sync($thumbnail, 'path', 'thumbnail_url', 'thumbnail_public_id'));
+    }
 
     public static function validationRules(?self $thumbnail = null): array
     {

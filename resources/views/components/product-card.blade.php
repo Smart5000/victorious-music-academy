@@ -1,13 +1,17 @@
 @props(['product'])
 
+@php
+    $thumbnailUrl = \App\Support\Media::url($product->thumbnail_url, $product->thumbnail);
+@endphp
+
 <a
     href="{{ route('store.products.show', $product) }}"
     {{ $attributes->class('group block cursor-pointer focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#513CC7]') }}
 >
     <div class="h-56 overflow-hidden rounded-xl bg-[#513CC7]/10 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-focus-visible:-translate-y-1 group-focus-visible:shadow-xl sm:h-60">
-        @if ($product->thumbnail)
+        @if ($thumbnailUrl)
             <img
-                src="{{ asset('storage/'.$product->thumbnail) }}"
+                src="{{ $thumbnailUrl }}"
                 alt="{{ $product->title }}"
                 class="h-full w-full object-cover transition duration-300"
                 loading="lazy"

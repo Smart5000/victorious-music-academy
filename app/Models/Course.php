@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CloudinaryModelMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,8 @@ class Course extends Model
         'slug',
         'description',
         'thumbnail',
+        'thumbnail_url',
+        'thumbnail_public_id',
         'order',
         'is_premium',
     ];
@@ -26,6 +29,11 @@ class Course extends Model
     protected $casts = [
         'is_premium' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(fn (self $course) => CloudinaryModelMedia::sync($course, 'thumbnail', 'thumbnail_url', 'thumbnail_public_id'));
+    }
 
     public static function validationRules(?self $course = null): array
     {

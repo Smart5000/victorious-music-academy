@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CloudinaryModelMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,8 @@ class Instrument extends Model
         'slug',
         'description',
         'thumbnail',
+        'thumbnail_url',
+        'thumbnail_public_id',
         'coming_soon',
         'is_active',
     ];
@@ -24,6 +27,11 @@ class Instrument extends Model
         'coming_soon' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(fn (self $instrument) => CloudinaryModelMedia::sync($instrument, 'thumbnail', 'thumbnail_url', 'thumbnail_public_id'));
+    }
 
     public static function validationRules(?self $instrument = null): array
     {

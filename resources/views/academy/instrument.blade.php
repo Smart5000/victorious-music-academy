@@ -8,6 +8,10 @@
 
     <div class="bg-[#F8F6F2] py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" x-data="{ showPlans: false }">
+            @php
+                $instrumentThumbnailUrl = \App\Support\Media::url($instrument->thumbnail_url, $instrument->thumbnail);
+            @endphp
+
             @if (session('status'))
                 <div class="mb-8 rounded-2xl bg-[#513CC7]/10 p-4 font-bold text-[#513CC7]">{{ session('status') }}</div>
             @endif
@@ -15,9 +19,9 @@
             <section class="rounded-[2rem] bg-white p-6 shadow-[0_18px_60px_rgba(28,31,47,0.08)] ring-1 ring-[#513CC7]/10 sm:p-8">
                 <div class="grid gap-6 lg:grid-cols-[17px_1fr_auto] lg:items-center">
                     <div class="w-full max-w-[17px] overflow-hidden rounded-[1.5rem] bg-[#513CC7]/10">
-                        @if ($instrument->thumbnail)
+                        @if ($instrumentThumbnailUrl)
                             <img
-                                src="{{ asset('storage/'.$instrument->thumbnail) }}"
+                                src="{{ $instrumentThumbnailUrl }}"
                                 alt="{{ $instrument->title }}"
                                 class="h-[12px] w-[17px] object-cover"
                                 loading="lazy"

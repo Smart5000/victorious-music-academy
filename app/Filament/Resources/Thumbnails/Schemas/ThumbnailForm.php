@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Thumbnails\Schemas;
 
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,7 +22,7 @@ class ThumbnailForm
                 ]),
                 TextInput::make('thumbnailable_id')->label('Related Record UUID')->rule('uuid'),
                 TextInput::make('title')->required()->maxLength(255),
-                FileUpload::make('path')
+                FilamentCloudinaryUpload::image(FileUpload::make('path')
                     ->image()
                     ->disk('public')
                     ->directory('thumbnails')
@@ -31,7 +32,7 @@ class ThumbnailForm
                     ->fetchFileInformation(false)
                     ->deletable()
                     ->openable()
-                    ->required(),
+                    ->required(), 'victorious-music-academy/thumbnails'),
                 TextInput::make('alt_text')->maxLength(255),
                 Toggle::make('is_primary')->default(true),
             ]);

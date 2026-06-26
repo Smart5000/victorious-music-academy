@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Courses\Schemas;
 
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,7 +21,7 @@ class CourseForm
                 TextInput::make('title')->required()->maxLength(255),
                 TextInput::make('slug')->required()->unique(ignoreRecord: true)->maxLength(255),
                 Textarea::make('description')->columnSpanFull(),
-                FileUpload::make('thumbnail')
+                FilamentCloudinaryUpload::image(FileUpload::make('thumbnail')
                     ->image()
                     ->disk('public')
                     ->directory('courses')
@@ -29,7 +30,7 @@ class CourseForm
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
                     ->deletable()
-                    ->openable(),
+                    ->openable(), 'victorious-music-academy/courses'),
                 TextInput::make('order')->numeric()->default(0)->required(),
                 Toggle::make('is_premium')
                     ->label('Premium Course')

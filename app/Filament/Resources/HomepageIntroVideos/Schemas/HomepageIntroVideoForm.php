@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HomepageIntroVideos\Schemas;
 
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -12,19 +13,19 @@ class HomepageIntroVideoForm
     {
         return $schema
             ->components([
-                FileUpload::make('video')
+                FilamentCloudinaryUpload::video(FileUpload::make('video')
                     ->label('Homepage Intro Video')
                     ->disk('public')
                     ->directory('homepage/intro-videos')
                     ->visibility('public')
-                    ->acceptedFileTypes(['video/mp4', 'video/webm'])
+                    ->acceptedFileTypes(['video/mp4', 'video/webm', 'video/quicktime'])
                     ->helperText('MP4 is recommended. Maximum file size: 100 MB.')
                     ->maxSize(102400)
                     ->fetchFileInformation(false)
                     ->deletable()
                     ->openable()
-                    ->required(),
-                FileUpload::make('poster')
+                    ->required(), 'victorious-music-academy/homepage/intro-videos'),
+                FilamentCloudinaryUpload::image(FileUpload::make('poster')
                     ->label('Video Poster Image')
                     ->image()
                     ->disk('public')
@@ -34,7 +35,7 @@ class HomepageIntroVideoForm
                     ->maxSize(5120)
                     ->fetchFileInformation(false)
                     ->deletable()
-                    ->openable(),
+                    ->openable(), 'victorious-music-academy/homepage/intro-posters'),
                 Toggle::make('is_active')
                     ->label('Is Active')
                     ->default(true),

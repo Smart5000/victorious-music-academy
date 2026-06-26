@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StoreBanners\Schemas;
 
+use App\Support\FilamentCloudinaryUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -12,7 +13,7 @@ class StoreBannerForm
     {
         return $schema
             ->components([
-                FileUpload::make('image')
+                FilamentCloudinaryUpload::image(FileUpload::make('image')
                     ->label('Store Banner Image')
                     ->image()
                     ->disk('public')
@@ -23,7 +24,7 @@ class StoreBannerForm
                     ->fetchFileInformation(false)
                     ->deletable()
                     ->openable()
-                    ->required(),
+                    ->required(), 'victorious-music-academy/store/banners'),
                 Toggle::make('is_active')
                     ->label('Is Active')
                     ->default(true),

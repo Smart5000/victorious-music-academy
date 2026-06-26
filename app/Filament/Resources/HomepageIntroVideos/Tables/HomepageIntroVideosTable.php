@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HomepageIntroVideos\Tables;
 
+use App\Support\Media;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,7 +19,9 @@ class HomepageIntroVideosTable
         return $table
             ->defaultSort('updated_at', 'desc')
             ->columns([
-                ImageColumn::make('poster')->label('Poster')->disk('public'),
+                ImageColumn::make('poster_url')
+                    ->label('Poster')
+                    ->getStateUsing(fn ($record): ?string => Media::url($record->poster_url, $record->poster)),
                 TextColumn::make('video')->label('Video')->limit(45),
                 IconColumn::make('is_active')->label('Active')->boolean(),
                 TextColumn::make('updated_at')->label('Last Updated')->dateTime()->sortable(),

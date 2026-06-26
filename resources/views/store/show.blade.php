@@ -1,6 +1,8 @@
 @php
     $whatsappNumber = preg_replace('/\D+/', '', config('services.whatsapp.number', '2348053894724'));
     $whatsappMessage = "Hello Victorious Music Academy, I am interested in buying {$product->title} for {$product->price_label}. Please send me more details.";
+    $thumbnailUrl = \App\Support\Media::url($product->thumbnail_url, $product->thumbnail);
+    $materialUrl = \App\Support\Media::url($product->material_url, $product->material_file);
 @endphp
 
 <x-app-layout>
@@ -24,8 +26,8 @@
         <div class="vvmi-container space-y-12">
             <section class="grid gap-8 rounded-[2.5rem] bg-white p-6 shadow-[0_18px_60px_rgba(28,31,47,0.08)] ring-1 ring-[#513CC7]/10 lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
                 <div class="overflow-hidden rounded-[2rem] bg-[#513CC7]/10">
-                    @if ($product->thumbnail)
-                        <img src="{{ asset('storage/'.$product->thumbnail) }}" alt="{{ $product->title }}" class="aspect-[4/3] w-full object-cover">
+                    @if ($thumbnailUrl)
+                        <img src="{{ $thumbnailUrl }}" alt="{{ $product->title }}" class="aspect-[4/3] w-full object-cover">
                     @else
                         <div class="grid aspect-[4/3] place-items-center text-center text-[#513CC7]">
                             <div>
@@ -56,8 +58,8 @@
 
                     <div class="mt-8 flex flex-wrap gap-3">
                         @if ($product->is_free)
-                            @if ($product->isMaterials() && $product->material_file && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->material_file))
-                                <a href="{{ asset('storage/'.$product->material_file) }}" class="vvmi-button-primary" download>
+                            @if ($product->isMaterials() && $materialUrl)
+                                <a href="{{ $materialUrl }}" class="vvmi-button-primary" download>
                                     Free Download
                                 </a>
                             @endif

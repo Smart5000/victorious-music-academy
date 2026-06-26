@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CloudinaryModelMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +28,11 @@ class Product extends Model
         'short_description',
         'description',
         'thumbnail',
+        'thumbnail_url',
+        'thumbnail_public_id',
         'material_file',
+        'material_url',
+        'material_public_id',
         'price',
         'price_type',
         'currency',
@@ -67,6 +72,9 @@ class Product extends Model
             if ($product->isInstrument()) {
                 $product->material_file = null;
             }
+
+            CloudinaryModelMedia::sync($product, 'thumbnail', 'thumbnail_url', 'thumbnail_public_id');
+            CloudinaryModelMedia::sync($product, 'material_file', 'material_url', 'material_public_id', 'raw');
 
             if (! $product->product_category_id) {
                 $category = ProductCategory::query()->firstOrCreate(
