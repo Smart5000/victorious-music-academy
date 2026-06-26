@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\File;
@@ -24,9 +25,20 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-	if (app()->environment('production')) {
-    URL::forceScheme('https');
-}
+        if (app()->environment('production')) {
+            Request::setTrustedProxies(
+                ['*'],
+                Request::HEADER_X_FORWARDED_FOR
+                    | Request::HEADER_X_FORWARDED_HOST
+                    | Request::HEADER_X_FORWARDED_PORT
+                    | Request::HEADER_X_FORWARDED_PROTO
+                    | Request::HEADER_X_FORWARDED_PREFIX
+                    | Request::HEADER_X_FORWARDED_AWS_ELB,
+            );
+
+            URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
+        }
 
         Schema::defaultStringLength(191);
 
