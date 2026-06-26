@@ -4,7 +4,11 @@ namespace App\Support;
 
 use App\Services\CloudinaryService;
 use Filament\Forms\Components\FileUpload;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Throwable;
 
 class FilamentCloudinaryUpload
 {
@@ -27,15 +31,50 @@ class FilamentCloudinaryUpload
     {
         return $upload
             ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, CloudinaryService $cloudinary) use ($folder, $resourceType): string {
-                $result = match ($resourceType) {
-                    'video' => $cloudinary->uploadVideo($file, $folder),
-                    'raw' => $cloudinary->uploadFile($file, $folder),
-                    default => $cloudinary->uploadImage($file, $folder),
-                };
+                Log::info('Filament Cloudinary upload started.', [
+                    'folder' => $folder,
+                    'resource_type' => $resourceType,
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
 
-                CloudinaryUploadRegistry::remember($result);
+                try {
+                    $result = match ($resourceType) {
+                        'video' => $cloudinary->uploadVideo($file, $folder),
+                        'raw' => $cloudinary->uploadFile($file, $folder),
+                        default => $cloudinary->uploadImage($file, $folder),
+                    };
 
-                return $result['secure_url'];
+                    CloudinaryUploadRegistry::remember($result);
+
+                    Log::info('Filament Cloudinary upload completed.', [
+                        'folder' => $folder,
+                        'resource_type' => $resourceType,
+                        'public_id' => $result['public_id'],
+                    ]);
+
+                    return $result['secure_url'];
+                } catch (Throwable $exception) {
+                    report($exception);
+
+                    Log::error('Filament Cloudinary upload failed; falling back to public disk.', [
+                        'folder' => $folder,
+                        'resource_type' => $resourceType,
+                        'exception' => $exception::class,
+                        'message' => $exception->getMessage(),
+                    ]);
+
+                    $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'upload';
+                    $path = trim($folder, '/').'/'.Str::uuid().'.'.$extension;
+
+                    Storage::disk('public')->put($path, file_get_contents($file->getRealPath()));
+
+                    Log::warning('Filament upload saved to public disk fallback.', [
+                        'path' => $path,
+                    ]);
+
+                    return $path;
+                }
             })
             ->getUploadedFileUsing(fn (string $file): array => [
                 'name' => basename(parse_url($file, PHP_URL_PATH) ?: $file),

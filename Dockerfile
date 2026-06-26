@@ -32,13 +32,24 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+COPY docker/php.ini /usr/local/etc/php/conf.d/uploads.ini
+
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN npm install && npm run build
 
-RUN chmod -R 775 storage bootstrap/cache
+RUN mkdir -p \
+        storage/app/public \
+        storage/app/livewire-tmp \
+        storage/app/private/livewire-tmp \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 

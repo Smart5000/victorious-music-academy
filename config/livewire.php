@@ -129,7 +129,7 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK', 'public'),
+        'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK', 'local'),
         'rules' => ['required', 'file', 'max:102400'],
         'directory' => 'livewire-tmp',
         'middleware' => null,                                 // Example: 'throttle:5,1'            | Default: 'throttle:60,1'
@@ -274,7 +274,7 @@ return [
     */
 
     'payload' => [
-        'max_size' => 1024 * 1024,   // 1MB - maximum request payload size in bytes
+        'max_size' => (int) env('LIVEWIRE_PAYLOAD_MAX_SIZE', 20 * 1024 * 1024),
         'max_nesting_depth' => 10,   // Maximum depth of dot-notation property paths
         'max_calls' => 50,           // Maximum method calls per request
         'max_components' => 200,     // Maximum components per batch request
